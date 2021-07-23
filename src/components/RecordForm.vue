@@ -6,8 +6,9 @@
             <input type="text" v-model="form.list">
           </div>
           <div>
-            <label for="date">วัน/เดือน/ปี</label>
-            <input type="text" v-model="form.date">
+            
+            <label for="date">วันที่</label>
+            <input type="date" id="date" name="date" v-model="form.date">
           </div>
 
 
@@ -55,13 +56,21 @@ export default {
         addRecord(){
             let payload = {
                 list: this.form.list,
-                date: this.form.date,
+                date: this.formatDate(this.form.date),
                 type: this.form.type,
                 amount: this.form.amount
             }
             RecordStore.dispatch("addRecord",payload)
 
             this.clearForm()
+        },
+        formatDate(editDate){
+          let oldDate = editDate.split("-")
+          let date = oldDate[2];
+          oldDate[2]=oldDate[0];
+          oldDate[0]=date;
+          let newDate = oldDate.join("-");
+          return newDate
         }
     }
 }

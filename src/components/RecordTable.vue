@@ -5,7 +5,7 @@
                 <tr>
                     <th>#</th>
                     <th>รายการ</th>
-                    <th>วัน/เดือน/ปี</th>
+                    <th>วัน-เดือน-ปี</th>
                     <th>ประเภท</th>
                     <th>จำนวน</th>
                 </tr>
@@ -37,11 +37,11 @@
              /> 
         <div>
             <label for="start">ตั้งแต่วันที่</label>
-            <input type="text" v-model="date.start">
+            <input type="date" id="sDate" name="sDate" v-model="date.start">
         </div>
         <div>
             <label for="end" >ถึงวันที่</label>
-            <input type="text" v-model="date.end">
+            <input type="date" id="eDate" name="eDate" v-model="date.end">
         </div>
         <div>
             <button @click="calDate">Add</button>
@@ -98,24 +98,30 @@ export default {
                 ["รายจ่าย", expenses]
             ]
         },
-        sortDate(date){
-            let oldDate=date.split("/");
+        formatDateInput(editDate){
+          let oldDate = editDate.split("-")
+          let date = oldDate[2];
+          oldDate[2]=oldDate[0];
+          oldDate[0]=date;
+          let newDate = oldDate.join("-");
+          return newDate
+        },
+        formatRecordDate(date){
+            let oldDate=date.split("-");
             let month = oldDate[1];
             oldDate[1]=oldDate[0];
             oldDate[0]=month;
-            let newDate = oldDate.join("/");
+            let newDate = oldDate.join("-");
             return newDate
         },
         calDate(){
             let income =0;
             let expenses =0;
             
-            const start_date = Date.parse(this.sortDate(this.date.start));
-            const end_date = Date.parse(this.sortDate(this.date.end));
-            console.log(start_date);
-            console.log(end_date);
+            const start_date = Date.parse(this.formatRecordDate(this.formatDateInput(this.date.start)));
+            const end_date = Date.parse(this.formatRecordDate(this.formatDateInput(this.date.end)));
             for(let i =0;i<this.records.length;i++){
-                const rec_date = Date.parse(this.sortDate(this.records[i].date));
+                const rec_date = Date.parse(this.formatRecordDate(this.records[i].date));
                 if(rec_date >= start_date && rec_date<=end_date ){
                     if(this.records[i].type == "รายรับ"){
                         income+=parseInt(this.records[i].amount)
@@ -125,7 +131,6 @@ export default {
                 }
             }
             
-            // console.log(start);
             this.upDateChart(income,expenses)
         },
         

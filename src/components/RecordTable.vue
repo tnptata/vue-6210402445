@@ -1,6 +1,7 @@
 <template>
-  <div class="rc">
-        <table>
+  <div class="table-graph">
+        <h2>ตารางบันทึกรายรับ-รายจ่าย</h2>
+        <table class="table-record">
             <thead>
                 <tr>
                     <th>#</th>
@@ -13,9 +14,12 @@
             <tbody>
                 <tr v-for="(record, index) in records" :key="index">
                     <td>{{ index+1 }}</td>
-                    <td>{{ record.list}}</td>
-                    <td>{{ record.date}}</td>
-                    <td>{{ record.type}}</td>
+                    <td v-if="record.list==''">ไม่ระบุ</td>
+                    <td v-if="record.list!=''">{{ record.list}}</td>
+                    <td v-if="record.date=='--'">ไม่ระบุ</td>
+                    <td v-if="record.date!='--'">{{ record.date}}</td>
+                    <td v-if="record.type==''">ไม่ระบุ</td>
+                    <td v-if="record.type!=''">{{ record.type}}</td>
                     <td>{{ record.amount}}</td>
                 </tr>
             </tbody>
@@ -30,21 +34,25 @@
                 </tr>
             </tfoot>
         </table>
+        <h2>กราฟเปรียบเทียบรายรับ-รายจ่าย</h2>
         <GChart
             type="ColumnChart"
             :data="chartData"
              :options="chartOptions"
              /> 
-        <div>
-            <label for="start">ตั้งแต่วันที่</label>
-            <input type="date" id="sDate" name="sDate" v-model="date.start">
-        </div>
-        <div>
-            <label for="end" >ถึงวันที่</label>
-            <input type="date" id="eDate" name="eDate" v-model="date.end">
-        </div>
-        <div>
-            <button @click="calDate">Add</button>
+        <h3>เลือกช่วงเวลา</h3>
+        <div class="date-scope">
+            <div>
+                <label for="start">ตั้งแต่วันที่</label>
+                <input type="date" id="sDate" name="sDate" class="start-input" v-model="date.start">
+            </div>
+            <div>
+                <label for="end" >ถึงวันที่</label>
+                <input type="date" id="eDate" name="eDate" class="end-input"  v-model="date.end">
+            </div>
+            <div>
+                <button @click="calDate" class="okBtn">Ok</button>
+            </div>
         </div>
     </div>
 </template>
@@ -117,16 +125,52 @@ export default {
         calDate(){
             let income =0;
             let expenses =0;
-            
-            const start_date = Date.parse(this.formatRecordDate(this.formatDateInput(this.date.start)));
-            const end_date = Date.parse(this.formatRecordDate(this.formatDateInput(this.date.end)));
-            for(let i =0;i<this.records.length;i++){
-                const rec_date = Date.parse(this.formatRecordDate(this.records[i].date));
-                if(rec_date >= start_date && rec_date<=end_date ){
+            if(this.date.start=="" && this.date.end==""){
+                for(let i =0;i<this.records.length;i++){
                     if(this.records[i].type == "รายรับ"){
                         income+=parseInt(this.records[i].amount)
                     }else{
                         expenses+=parseInt(this.records[i].amount)
+                    }
+                }
+            }
+            else if(this.date.start==""){
+                const end_date = Date.parse(this.formatRecordDate(this.formatDateInput(this.date.end)));
+                for(let i =0;i<this.records.length;i++){
+                    const rec_date = Date.parse(this.formatRecordDate(this.records[i].date));
+                    if(rec_date<=end_date ){
+                        if(this.records[i].type == "รายรับ"){
+                            income+=parseInt(this.records[i].amount)
+                        }else{
+                            expenses+=parseInt(this.records[i].amount)
+                        }
+                    }
+                }
+            }
+            else if(this.date.end==""){
+                const start_date = Date.parse(this.formatRecordDate(this.formatDateInput(this.date.start)));
+                for(let i =0;i<this.records.length;i++){
+                    const rec_date = Date.parse(this.formatRecordDate(this.records[i].date));
+                    if(rec_date >= start_date ){
+                        if(this.records[i].type == "รายรับ"){
+                            income+=parseInt(this.records[i].amount)
+                        }else{
+                            expenses+=parseInt(this.records[i].amount)
+                        }
+                    }
+                }
+            }
+            else{
+                const start_date = Date.parse(this.formatRecordDate(this.formatDateInput(this.date.start)));
+                const end_date = Date.parse(this.formatRecordDate(this.formatDateInput(this.date.end)));
+                for(let i =0;i<this.records.length;i++){
+                    const rec_date = Date.parse(this.formatRecordDate(this.records[i].date));
+                    if(rec_date >= start_date && rec_date<=end_date ){
+                        if(this.records[i].type == "รายรับ"){
+                            income+=parseInt(this.records[i].amount)
+                        }else{
+                            expenses+=parseInt(this.records[i].amount)
+                        }
                     }
                 }
             }
@@ -139,7 +183,60 @@ export default {
 </script>
 
 <style>
-    .rc{
-        margin: 20px;
+    .table-graph{
+        margin-top: 30px;
+    }
+    .table-record{
+        margin-left: auto;
+        margin-right: auto;
+        
+    }
+    thead th,tbody td{
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    tbody tr:nth-child(even){
+        background-color: #f2f2f2;
+    }
+    tbody tr:hover {
+        background-color: #ddd;
+    }
+    thead th{
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: center;
+        background-color: #42b983;
+        color: white;
+    }
+    .start-input{
+        margin-left:20px;
+    }
+    .end-input{
+        margin-left:39px;
+    }
+    tfoot th{
+        color: #42b983;
+    }
+    h3{
+        color: #42b983;
+    }
+    h2{
+        color: #42b983;
+        margin-top: 30px;
+    }
+    table{
+        border-collapse: collapse;
+        width: 70%;
+    }
+    .date-scope div{
+        margin:10px;
+    }
+    .okBtn{
+        padding-left:10px;
+        padding-right:10px;
+        border-radius: 3px;
+        text-align: center;
+        background-color: #42b983;
+        color: white;  
     }
 </style>

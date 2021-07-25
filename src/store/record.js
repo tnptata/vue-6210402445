@@ -47,6 +47,24 @@ export default new Vuex.Store({
                     type:"รายรับ",
                     amount: 50
                   },
+                  {
+                    list: "ซื้อหนังสือ",
+                    date: "24-7-2021",
+                    type:"รายจ่าย",
+                    amount: 80
+                  },
+                  {
+                    list: "ซื้อก๊วยเตี๊ยว",
+                    date: "25-7-2021",
+                    type:"รายจ่าย",
+                    amount: 30
+                  },
+                  {
+                    list: "เก็บได้จากพื้น",
+                    date: "25-7-2021",
+                    type:"รายรับ",
+                    amount: 100
+                  },
               ]
           }
           commit("fetch",{ res })
@@ -54,25 +72,6 @@ export default new Vuex.Store({
       addRecord({ commit }, payload){
         commit('add', {payload})
       },
-      fetchRecord2({ commit }){
-        let res = {
-            data:[
-                {
-                    list: "แม่ให้",
-                    date: "7/22/2021",
-                    type:"รายรับ",
-                    amount: 100
-                },
-                {
-                    list: "ซื้อข้าว",
-                    date: "7/22/2021",
-                    type:"รายจ่าย",
-                    amount: 30
-                }
-            ]
-        }
-        commit("fetch",{ res })
-    }
 
   },
   modules: {
